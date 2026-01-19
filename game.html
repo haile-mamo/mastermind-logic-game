@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Mastermind Logic Game</title>
+    <style>
+        body { font-family: sans-serif; text-align: center; background-color: #f4f4f4; padding: 20px; }
+        
+        /* Note Boxes Design */
+        .filter-container {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .filter-box {
+            flex: 1;
+            max-width: 200px;
+            padding: 10px;
+            border-radius: 8px;
+            border: 2px solid #ddd;
+        }
+        .box-out { background-color: #ffebee; border-color: #d9534f; }
+        .box-maybe { background-color: #fff9c4; border-color: #fbc02d; }
+        .box-in { background-color: #e8f5e9; border-color: #4caf50; }
+        
+        .filter-title { font-size: 0.8em; font-weight: bold; display: block; margin-bottom: 5px; }
+        .note-input { width: 90%; padding: 5px; border: 1px solid #ccc; border-radius: 4px; text-align: center; font-size: 1.1em; }
+
+        .hint-text { 
+            color: #d9534f; font-weight: bold; font-size: 1.1em; margin: 10px auto; 
+            max-width: 600px; min-height: 40px; border: 2px solid #3498db; 
+            padding: 10px; border-radius: 8px; background: white;
+        }
+
+        #history { 
+            margin-top: 20px; border-top: 2px solid #333; padding-top: 10px; 
+            text-align: left; display: inline-block; width: 100%; max-width: 600px;
+        }
+
+        #ss { color: #888; font-size: 0.8em; }
+        input#ar { padding: 10px; font-size: 16px; width: 150px; border: 2px solid #3498db; border-radius: 5px; }
+        button { padding: 10px 20px; font-size: 16px; cursor: pointer; background-color: #5cb85c; color: white; border: none; border-radius: 5px; font-weight: bold; margin: 5px; }
+        .reset-btn { background-color: #3498db; }
+
+        .attempt-row { 
+            margin: 5px 0; padding: 10px; border-radius: 5px; background-color: white; 
+            border: 1px solid #ddd; font-size: 1em; color: #0056b3; 
+            display: block;
+        }
+        
+        .row-red { border-left: 15px solid #ff0000; background-color: #fff0f0; font-weight: bold; }
+        .row-yellow { border-left: 15px solid #ffcc00; background-color: #fffdf0; }
+        .row-normal { border-left: 5px solid #ddd; }
+
+        .label-red { color: #ff0000; font-weight: bold; }
+        .label-yellow { color: #b8860b; font-weight: bold; }
+
+        strong { color: #2c3e50; font-size: 1.1em; }
+    </style>
+</head>
+<body>
+    <div style="text-align: left; margin-bottom: 10px;">
+        <a href="index.html" style="text-decoration: none; color: blue; font-weight: bold;">⬅ Back to Instructions</a>
+    </div>
+    <h1>Play the Game</h1>
+    <h2>Entered numbers must not repeat and cannot contain zero.</h2>
+
+    <div class="filter-container">
+        <div class="filter-box box-out">
+            <span class="filter-title">⛔ 100% Out (Notes)</span>
+            <input type="text" class="note-input" placeholder="...">
+        </div>
+        <div class="filter-box box-maybe">
+            <span class="filter-title">❓ Uncertain (Notes)</span>
+            <input type="text" class="note-input" placeholder="...">
+        </div>
+        <div class="filter-box box-in">
+            <span class="filter-title">✅ 100% In (Notes)</span>
+            <input type="text" class="note-input" placeholder="...">
+        </div>
+    </div>
+
+    <p id="ss"></p> 
+    <p id="h" class="hint-text"></p>
+    <input id="ar" type="text" maxlength="4" placeholder="Enter 4 digits" onkeypress="if(event.key === 'Enter') checkGuess()">
+    <button onclick="checkGuess()">Check</button>
+    <button class="reset-btn" onclick="resetGame()">Restart Game</button>
+    
+    <div id="history"></div>
+
+    <script>
+    let firstNumber = null;
+    let firstpm = null;
+    let targetArray = [];
+    
+    function generateTarget() {
+        targetArray = [];
+        while (targetArray.length < 4) {
+            let r = Math.floor(Math.random() * 9) + 1; 
+            if (!targetArray.includes(r)) targetArray.push(r);
+        }
+    }
+
+    function resetGame() {
+        generateTarget();
+        firstNumber = null;
+        firstpm = null;
+        document.getElementById("history").innerHTML = "";
+        document.getElementById("h").innerHTML = "";
+        document.getElementById("ar").value = "";
+        let inputs = document.getElementsByClassName("note-input");
+        for(let i=0; i<inputs.length; i++) inputs[i].value = "";
+        alert("The game has been restarted!");
+    }
+
+    generateTarget();
+
+    function checkGuess() {
+        let inputField = document.getElementById("ar");
+        let userInput = inputField.value;
+        let historyDiv = document.getElementById("history");
+
+        if (userInput.length !== 4 || new Set(userInput).size !== 4 || userInput.includes("0")) {
+            alert("Please enter 4 non-repeating digits (1-9)!");
+            return;
+        }
+
+        let userArray = Array.from(userInput, Number);
+        let position = 0; let mark = 0;
+        for (let i = 0; i < 4; i++) {
+            if (userArray[i] === targetArray[i]) position++;
+            else if (targetArray.includes(userArray[i])) mark++;
+        }
+
+        let currentTotalPm = position + mark;
+        let hintMsg = "";
+
+        if (firstNumber === null) {
+            firstNumber = userInput;
+            firstpm = currentTotalPm;
+            hintMsg = "First attempt recorded. A hint will be provided after your second guess...";
+        } else {
+            let secondNumber = userInput;
+            let secondpm = currentTotalPm;
+            let m = 0;
+            for (let i = 0; i < 4; i++) {
+                if (firstNumber.includes(secondNumber[i])) m++;
+            }
+
+            let totalPm = firstpm + secondpm;
+            switch (true) {
+                case (m == 0 && firstpm == 2 && secondpm == 2): hintMsg = "Hint: The numbers not included in these two attempts are definitely not in the secret code."; break;
+                case (m == 0 && totalPm == 3): hintMsg = "Hint: It is certain that numbers not included in either attempt are part of the secret code."; break;
+                case (m == 1 && firstpm == 1 && secondpm == 3): hintMsg = "Hint: At least two numbers in the current attempt that were not in the previous one are definitely in the secret code."; break;
+                case (m == 1 && firstpm == 3 && secondpm == 1): hintMsg = "Hint: At least two numbers in the previous attempt that are not in the current one are definitely in the secret code."; break;
+                case (m == 2 && secondpm == 2 && firstpm == 0): hintMsg = "Hint: The two numbers in the current attempt that were not repeated from the previous one are definitely in the secret code."; break;
+                case (m == 2 && secondpm == 0 && firstpm == 2): hintMsg = "Hint: Two numbers in the previous attempt that are not in the current one are definitely in the secret code."; break;
+                case (m == 2 && secondpm == 2 && firstpm == 3): hintMsg = "Hint: From the numbers in the previous attempt not present in the current one, at least one is definitely included and two are likely included."; break;
+                case (m == 2 && secondpm == 3 && firstpm == 1): hintMsg = "Hint: Two numbers in the current attempt that were not in the previous one are definitely included."; break;
+                case (m == 2 && secondpm == 1 && firstpm == 3): hintMsg = "Hint: Two numbers in the previous attempt that are not in the current one are definitely included."; break;
+                case (m == 2 && firstpm == 1 && secondpm == 1): hintMsg = "Hint: At least two (possibly three) of the numbers not yet tested are definitely in the secret code."; break;
+                case (m == 3 && secondpm == 2 && firstpm == 1): hintMsg = "Hint: One number in the current attempt not found in the previous one is 100% in the code, and one number not included in either attempt is also in the code."; break;
+                case (m == 3 && secondpm == 1 && firstpm == 2): hintMsg = "Hint: One number in the previous attempt not found in the current one is 100% in the code, and one number not included in either attempt is also in the code."; break;
+                case (secondpm == 4): hintMsg = "You found all numbers! Now arrange them in the correct positions."; break;
+                case (m == 3 && secondpm == 2 && firstpm == 3): hintMsg = "Hint: A number in the previous attempt not in the current one is definitely in the code, and one of the unused numbers is also correctly included."; break;
+                case (m == 3 && secondpm == 3 && firstpm == 2): hintMsg = "Hint: One number in the current attempt not in the previous one is 100% in the code, and one unused number is also in the secret code."; break;
+                case (m == 0 && secondpm == 3 && firstpm == 1): hintMsg = "Hint: The numbers not included in these two attempts are definitely not in the secret code."; break;
+                case (m == 0 && secondpm == 1 && firstpm == 3): hintMsg = "Hint: The numbers not included in these two attempts are definitely not in the secret code."; break;
+                case (m == 2 && secondpm == 2 && firstpm == 1): hintMsg = "Hint: It is certain that numbers not included in either attempt are part of the secret code."; break;
+                case (m == 2 && secondpm == 1 && firstpm == 2): hintMsg = "Hint: It is certain that numbers not included in either attempt are part of the secret code."; break;
+                case (m == 0 && totalPm == 3): hintMsg = "Hint: Among the numbers not included in either attempt, one is certain and possibly two are in the code."; break;
+                case (m == 1 && secondpm == 2 && firstpm == 0): hintMsg = "Hint: Numbers not in either attempt are definitely in the code, and some numbers in the current attempt (not in the previous) are also present."; break;
+                case (m == 1 && secondpm == 0 && firstpm == 2): hintMsg = "Hint: Numbers not in either attempt are definitely in the code, and some numbers in the previous attempt (not in the current) are also present."; break;
+                case (m == 1 && secondpm == 0 && firstpm == 3): hintMsg = "Hint: Numbers in the previous attempt not in the current one are definitely in the code, and one unused number is also present."; break;
+                case (m == 1 && secondpm == 3 && firstpm == 0): hintMsg = "Hint: Numbers in the current attempt not in the previous one are definitely in the code, and one unused number is also present."; break;
+                case (m == 3 && secondpm == 1 && firstpm == 1): hintMsg = "Hint: Two (possibly three) of the numbers not included in either attempt are definitely in the secret code."; break;
+                default: hintMsg = "No specific hint for this comparison. Please compare your attempts manually and continue guessing."; 
+            }
+            document.getElementById("h").innerHTML = hintMsg;
+            firstNumber = secondNumber; firstpm = secondpm;
+        }
+
+        let rows = historyDiv.getElementsByClassName('attempt-row');
+        for (let i = 0; i < rows.length; i++) {
+            rows[i].classList.remove('row-red', 'row-yellow');
+            rows[i].classList.add('row-normal');
+            let oldLabel = rows[i].getElementsByClassName('status-label')[0];
+            if (oldLabel) oldLabel.remove();
+        }
+
+        let currentResult = `Guess: <strong>${userInput}</strong> | Found: ${currentTotalPm} | Position: ${position}`;
+        let newRow = document.createElement('div');
+        newRow.className = 'attempt-row row-red';
+        newRow.innerHTML = `<span class="status-label label-red">[Current Attempt] </span>` + currentResult;
+        
+        if (rows.length > 0) {
+            rows[0].classList.replace('row-normal', 'row-yellow');
+            let yellowLabel = document.createElement('span');
+            yellowLabel.className = 'status-label label-yellow';
+            yellowLabel.innerText = '[Previous Attempt] ';
+            rows[0].prepend(yellowLabel);
+        }
+
+        if (position === 4) {
+            newRow.innerHTML = `🎉 Congratulations! The number was <strong>${userInput}</strong>.`;
+            document.getElementById("h").innerHTML = "Game Completed!";
+        }
+
+        historyDiv.insertBefore(newRow, historyDiv.firstChild);
+        inputField.value = ""; 
+    }
+    </script>
+</body>
+</html>
