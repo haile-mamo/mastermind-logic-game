@@ -5,7 +5,6 @@
     <style>
         body { font-family: sans-serif; text-align: center; background-color: #f4f4f4; padding: 20px; }
         
-        /* Note Boxes Design */
         .filter-container {
             display: flex;
             justify-content: center;
@@ -83,7 +82,7 @@
     <p id="ss"></p> 
     <p id="h" class="hint-text"></p>
     <input id="ar" type="text" maxlength="4" placeholder="Enter 4 digits" onkeypress="if(event.key === 'Enter') checkGuess()">
-    <button onclick="checkGuess()">Check</button>
+    <button id="checkBtn" onclick="checkGuess()">Check</button>
     <button class="reset-btn" onclick="resetGame()">Restart Game</button>
     
     <div id="history"></div>
@@ -108,6 +107,11 @@
         document.getElementById("history").innerHTML = "";
         document.getElementById("h").innerHTML = "";
         document.getElementById("ar").value = "";
+        
+        // ሳጥኑን እና በተኑን መልሶ መክፈት
+        document.getElementById("ar").disabled = false;
+        document.getElementById("checkBtn").disabled = false;
+        
         let inputs = document.getElementsByClassName("note-input");
         for(let i=0; i<inputs.length; i++) inputs[i].value = "";
         alert("The game has been restarted!");
@@ -204,6 +208,10 @@
         if (position === 4) {
             newRow.innerHTML = `🎉 Congratulations! The number was <strong>${userInput}</strong>.`;
             document.getElementById("h").innerHTML = "Game Completed!";
+            
+            // ጨዋታው ሲያልቅ የሚዘጉ
+            document.getElementById("ar").disabled = true;
+            document.getElementById("checkBtn").disabled = true;
         }
 
         historyDiv.insertBefore(newRow, historyDiv.firstChild);
