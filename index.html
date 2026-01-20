@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Instruction Page - Number Secret</title>
+    <style>
+    .btn-container {
+        display: flex;         /* ፍሌክስ ቦክስን ለመጠቀም */
+        justify-content: center; /* በጎን (Horizontal) መሃል ለማድረግ */
+        align-items: center;     /* በቁመት (Vertical) መሃል ለማድረግ */
+        margin-top: 50px;      /* ከላይ ካለው ጽሁፍ እንዲርቅ (ታች እንዲሆን) */
+        width: 100%;           /* ሙሉ ስፋት እንዲኖረው */
+    }
+
+    .start-btn {
+        background: #16a34a;   /* አረንጓዴ ቀለም */
+        color: white;
+        padding: 18px 60px;
+        text-decoration: none;
+        border-radius: 50px;
+        font-weight: bold;
+        font-size: 1.5rem;
+        display: inline-block;
+        box-shadow: 0 5px 15px rgba(22, 163, 74, 0.4);
+        transition: 0.3s;
+    }
+
+    
+        :root {
+            --primary: #1e40af;
+            --success: #16a34a;
+            --danger: #dc2626;
+            --warning: #ca8a04;
+            --bg-page: #dcfce7; 
+            /* የሳጥኑን ባግራውንድ ከነጭ ወደ ብርሃናማ አረንጓዴ ለመቀየር */
+            --bg-card: #f0fdf4; 
+        }
+
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            background-color: var(--bg-page); 
+            display: flex; justify-content: center; padding: 20px; line-height: 1.6;
+            margin: 0;
+        }
+
+        .instruction-sheet {
+            max-width: 850px; 
+            background: var(--bg-card); /* እዚህ ጋር ነጭ የነበረው ተቀይሯል */
+            padding: 40px; 
+            border-radius: 25px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1); 
+            border: 5px solid var(--success);
+        }
+
+        h1 { color: var(--success); text-align: center; font-size: 2.5rem; margin-bottom: 30px; text-shadow: 1px 1px 1px rgba(0,0,0,0.1); }
+        
+        /* የጽሁፍ ቀለሞች */
+        p { color: #164e63; font-weight: 500; }
+        li { color: #164e63; font-weight: 500; margin-bottom: 5px; }
+
+        .section-title { 
+            color: var(--primary); font-size: 1.5rem; font-weight: bold; 
+            border-bottom: 3px solid var(--success); margin-bottom: 15px; padding-bottom: 5px;
+        }
+
+        .note-container { display: flex; gap: 10px; margin: 20px 0; }
+        .note-box { 
+            flex: 1; padding: 12px; border-radius: 10px; text-align: center; 
+            font-weight: bold; font-size: 0.9rem; border: 2px solid rgba(0,0,0,0.1);
+            box-shadow: 2px 2px 5px rgba(0,0,0,0.05);
+        }
+        .box-red { background: #fee2e2; color: #b91c1c; border-color: #f87171; }
+        .box-yellow { background: #fef3c7; color: #92400e; border-color: #fbbf24; }
+        .box-green { background: #dcfce7; color: #166534; border-color: #4ade80; }
+
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; overflow: hidden; border-radius: 12px; background: white; }
+        th { background: var(--success); color: white; padding: 15px; font-size: 1.1rem; }
+        td { border: 1px solid #cbd5e1; padding: 12px; text-align: center; font-weight: bold; }
+
+        .prev-row { background: #fffbeb; color: #854d0e; }
+        .current-row { background: #f0f9ff; color: #075985; }
+        .win-row { background: var(--success) !important; color: white !important; font-size: 1.2rem; }
+
+        .highlight-text { color: var(--danger); font-weight: 900; font-size: 1.1rem; }
+
+        .btn-container { text-align: center; margin-top: 40px; }
+        .start-btn { 
+            background: var(--success); color: white; padding: 18px 60px; 
+            text-decoration: none; border-radius: 50px; font-weight: bold; 
+            font-size: 1.5rem; display: inline-block; transition: 0.3s;
+            box-shadow: 0 5px 15px rgba(22, 163, 74, 0.4);
+        }
+        .start-btn:hover { background: #15803d; transform: translateY(-3px); }
+		/* ለሞባይል ስክሪን የተጨመረ ማስተካከያ */
+@media (max-width: 600px) {
+    body {
+        padding: 10px; /* በጎን ያለው ክፍተት እንዲቀንስ */
+    }
+
+    .instruction-sheet {
+        padding: 20px; /* የውስጥ ክፍተት ለስልክ እንዲጠበብ */
+        border-width: 3px; /* የቦርደሩ ውፍረት እንዲቀንስ */
+        width: 100%;
+    }
+
+    h1 {
+        font-size: 1.8rem; /* የርዕሱ ጽሁፍ መጠን እንዲቀንስ */
+    }
+
+    .note-container {
+        flex-direction: column; /* ሳጥኖቹ ጎን ለጎን ከመሆን ይልቅ አንዱ ከሌላው በታች እንዲሆኑ */
+        gap: 15px;
+    }
+
+    .note-box {
+        width: 100%;
+    }
+
+    .start-btn {
+        width: 100%; /* በተኑ የሞባይሉን ስክሪን ስፋት እንዲይዝ */
+        padding: 15px 30px;
+        font-size: 1.2rem;
+    }
+
+    table {
+        font-size: 0.8rem; /* ሠንጠረዡ ከስክሪን እንዳይወጣ ጽሁፉን መቀነስ */
+    }
+    
+    th, td {
+        padding: 8px 4px; /* የሠንጠረዡ ክፍተት እንዲጠበብ */
+    }
+}
+    </style>
+</head>
+<body>
+
+<div class="instruction-sheet">
+    <h1>Welcome to "Number Secret" Game!</h1>
+
+    <div class="section">
+        <div class="section-title">🎯 Objective and Rules</div>
+        <p>The goal is to guess a 4-digit number with its correct position. Numbers must be between 1-9 (Zero and duplicate digits are not allowed).</p>
+    </div>
+
+    <div class="section">
+        <div class="section-title">📝 The Filter Boxes (Notes)</div>
+        <p>This is not part of the game. It is a scratchpad designed to help you remember and calculate instead of using a pen and paper. What you put here is just for your memory and doesn't affect the game; you can choose not to use it.</p>
+        <div class="note-container">
+            <div class="note-box box-red">⛔ 100% Not Present (Note)</div>
+            <div class="note-box box-yellow">❓ Uncertain (Note)</div>
+            <div class="note-box box-green">✅ 100% Present (Note)</div>
+        </div>
+    </div>
+
+    <div class="section">
+        <div class="section-title">💡 Using Hints</div>
+        <p>This is also an optional feature. Its purpose is to compare your last two attempts and provide a prediction hint about the presence of numbers. <span class="highlight-text">Do not rely too heavily on hints;</span> it only compares the current and previous attempts and has limited impact on winning the game.</p>
+    </div>
+
+    <div class="section">
+        <div class="section-title">📊 How to Play (Example)</div>
+        <p>If the secret number is <strong>1234</strong>, the results would look like this:</p>
+        <table>
+            <thead>
+                <tr>
+                    <th>Attempt</th>
+                    <th>Your Guess</th>
+                    <th>Found</th>
+                    <th>Position</th>
+                    <th>Meaning (Analysis)</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr class="prev-row">
+                    <td>[Previous]</td>
+                    <td>1245</td>
+                    <td>3</td>
+                    <td>2</td>
+                    <td>1 and 2 are in their correct positions. 4 is present but in the wrong spot.</td>
+                </tr>
+                <tr class="current-row">
+                    <td>[Current]</td>
+                    <td>1345</td>
+                    <td>3</td>
+                    <td>1</td>
+                    <td>1, 3, and 4 are found, but only 1 is in the correct position.</td>
+                </tr>
+                <tr class="win-row">
+                    <td>Winner!</td>
+                    <td>1234</td>
+                    <td>4</td>
+                    <td>4</td>
+                    <td>🎉 Congratulations! You found 1, 2, 3, 4 in their correct positions. You won!</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="section" style="text-align: center; margin-top: 30px;">
+        <p><strong style="color: var(--danger);">Note:</strong> To win the game, focus on "Found" and "Position" rather than relying on hint predictions.</p>
+        <h2 style="color: var(--success); font-size: 1.8rem; letter-spacing: 1px;">Think | Calculate | Predict | Win</h2>
+        <div class="btn-container">
+        <a href="game.html" class="start-btn">Play the Game ➔</a>
+    </div>
+    
+</div>
+
+</body>
+</html>
